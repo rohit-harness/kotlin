@@ -10,6 +10,9 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.descriptors.WrappedDeclarationDescriptor
 import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.util.IdSignature
+import org.jetbrains.kotlin.ir.util.name
+import org.jetbrains.kotlin.ir.util.nameForIrSerialization
+import org.jetbrains.kotlin.ir.util.render
 
 abstract class IrPublicSymbolBase<out D : DeclarationDescriptor>(override val descriptor: D, override val signature: IdSignature) : IrSymbol
 
@@ -21,6 +24,10 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
             "Substituted descriptor $descriptor for ${descriptor.original}"
         }
         assert(sig.isPublic)
+        if (sig.toString()  == "kotlinx.cinterop.internal/CCall.<init>|1280618353163213788[0]") {
+            println("NEW SYMBOL for $sig")
+            Throwable().printStackTrace()
+        }
     }
 
     private fun isOriginalDescriptor(descriptor: DeclarationDescriptor): Boolean =
@@ -35,9 +42,12 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
 
     override fun bind(owner: B) {
         if (_owner == null) {
+            if ((owner as? IrDeclaration)?.nameForIrSerialization?.toString() == "simd_make_int3") {
+                Throwable().printStackTrace()
+            }
             _owner = owner
         } else {
-            throw IllegalStateException("${javaClass.simpleName} for $signature is already bound")
+            throw IllegalStateException("${javaClass.simpleName} for $signature is already bound to $_owner ${(_owner as IrDeclaration).descriptor} while the new owner wants to be $owner ${(owner as IrDeclaration).descriptor}")
         }
     }
 
@@ -50,6 +60,12 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
 class IrClassPublicSymbolImpl(descriptor: ClassDescriptor, sig: IdSignature) :
     IrBindablePublicSymbolBase<ClassDescriptor, IrClass>(descriptor, sig),
     IrClassSymbol {
+    init {
+        if ((descriptor !is WrappedDeclarationDescriptor<*>) && descriptor.name.toString() =="NSObject") {
+            println("NEW")
+            Throwable().printStackTrace()
+        }
+    }
 }
 
 class IrEnumEntryPublicSymbolImpl(descriptor: ClassDescriptor, sig: IdSignature) :

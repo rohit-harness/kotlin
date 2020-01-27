@@ -109,7 +109,7 @@ class FunctionInlining(val context: CommonBackendContext) : IrElementTransformer
                 (0 until callSite.typeArgumentsCount).map {
                     typeParameters[it].symbol to callSite.getTypeArgument(it)
                 }.associate { it }
-            DeepCopyIrTreeWithSymbolsForInliner(context, typeArguments, parent)
+            DeepCopyIrTreeWithSymbolsForInliner(/*context, */typeArguments, parent)
         }
 
         val substituteMap = mutableMapOf<IrValueParameter, IrExpression>()
