@@ -15,3 +15,5 @@ public expect fun testOnJvm(action: () -> Unit)
 public expect fun testOnJs(action: () -> Unit)
 
 public expect val isFloat32RangeEnforced: Boolean
+
+public expect val supportsSuppressedExceptions: Boolean

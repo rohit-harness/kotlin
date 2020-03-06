@@ -24,3 +24,5 @@ public actual fun testOnJs(action: () -> Unit) = action()
 
 // TODO: should be true at least in JS IR after implementing KT-24975
 public actual val isFloat32RangeEnforced: Boolean = false
+
+actual val supportsSuppressedExceptions: Boolean get() = true

@@ -33,3 +33,5 @@ public actual fun testOnJs(action: () -> Unit) {}
 public fun <T> platformNull() = Collections.singletonList(null as T).first()
 
 public actual val isFloat32RangeEnforced: Boolean = true
+
+public actual val supportsSuppressedExceptions: Boolean get() = !isJava6

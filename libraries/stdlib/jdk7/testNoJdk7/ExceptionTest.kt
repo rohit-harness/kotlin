@@ -15,9 +15,11 @@ class ExceptionTest {
         val e1 = Throwable()
         val e2 = Exception("Suppressed")
 
+        assertTrue(e1.suppressedExceptions.isEmpty())
         e1.addSuppressedExtension(e2)
 
         assertSame(e2, e1.suppressed.singleOrNull())
+        assertSame(e2, e1.suppressedExceptions.singleOrNull())
     }
 
 }
