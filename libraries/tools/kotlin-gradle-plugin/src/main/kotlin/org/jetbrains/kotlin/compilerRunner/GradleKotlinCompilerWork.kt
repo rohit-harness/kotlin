@@ -297,7 +297,7 @@ internal class GradleKotlinCompilerWork @Inject constructor(
         clearLocalState(outputFiles, log, reason = "out-of-process execution strategy is non-incremental")
 
         return try {
-            runToolInSeparateProcess(compilerArgs, compilerClassName, compilerFullClasspath, log)
+            runToolInSeparateProcess(compilerArgs, compilerClassName, compilerFullClasspath, log, projectRootFile)
         } finally {
             reportExecutionResultIfNeeded {
                 TaskExecutionResult(
