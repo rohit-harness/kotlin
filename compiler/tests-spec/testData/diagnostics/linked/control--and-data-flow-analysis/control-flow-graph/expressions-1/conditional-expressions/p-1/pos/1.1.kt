@@ -14,7 +14,7 @@
 
 // TESTCASE NUMBER: 1
 
-fun case1() {
+fun case1(debug : Boolean) {
     val b = true
     val a = if (b) {
         "true"
