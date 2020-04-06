@@ -63,6 +63,16 @@ class Executable(
         )
 }
 
+class JavaScriptLibrary(
+    compilation: KotlinJsCompilation,
+    name: String,
+    type: KotlinJsBinaryType
+) : JsIrBinary(
+    compilation,
+    name,
+    type
+)
+
 // Hack for legacy
 internal val JsBinary.executeTaskBaseName: String
     get() = generateBinaryName(

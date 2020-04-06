@@ -67,6 +67,14 @@ constructor(
         }
     }
 
+    fun javaScriptLibrary(
+        compilation: KotlinJsCompilation = defaultCompilation
+    ) {
+        if (target is KotlinJsTarget) {
+            throw IllegalStateException("Unfortunately you can use `javaScriptLibrary()` only with 'ir' compiler type")
+        }
+    }
+
     internal fun executableIrInternal(compilation: KotlinJsCompilation) = createBinaries(
         compilation = compilation,
         jsBinaryType = JsBinaryType.EXECUTABLE,
