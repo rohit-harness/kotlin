@@ -17,11 +17,11 @@
 package org.jetbrains.kotlin.psi2ir.intermediate
 
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.typeParametersCount
-import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.TypeSubstitutor
 
 fun IrVariable.defaultLoad(): IrExpression =
@@ -53,7 +53,11 @@ fun CallReceiver.adjustForCallee(callee: CallableMemberDescriptor): CallReceiver
     }
 
 
-fun computeSubstitutedSyntheticAccessor(propertyDescriptor: PropertyDescriptor, accessorFunctionDescriptor: FunctionDescriptor): FunctionDescriptor {
+fun computeSubstitutedSyntheticAccessor(
+    propertyDescriptor: PropertyDescriptor,
+    accessorFunctionDescriptor: FunctionDescriptor,
+    extensionAccessorDescriptor: PropertyAccessorDescriptor? = null
+): FunctionDescriptor {
     if (propertyDescriptor.original == propertyDescriptor) return accessorFunctionDescriptor
 
     // Compute substituted accessor descriptor in case of Synthetic Java property `Java: getFoo() -> Kotlin: foo`
@@ -64,6 +68,8 @@ fun computeSubstitutedSyntheticAccessor(propertyDescriptor: PropertyDescriptor, 
     }
 
     if (accessorFunctionDescriptor !is SimpleFunctionDescriptor) return accessorFunctionDescriptor
+
+    extensionAccessorDescriptor?.let { return copyTypesFromExtensionAccessor(accessorFunctionDescriptor, it) }
 
     /**
      * Consider java class like
@@ -100,3 +106,25 @@ fun computeSubstitutedSyntheticAccessor(propertyDescriptor: PropertyDescriptor, 
     val typeSubstitutor = TypeSubstitutor.create(collectedTypeParameters.zip(typeArguments).toMap())
     return accessorFunctionDescriptor.substitute(typeSubstitutor) ?: error("Cannot substitute descriptor for $accessorFunctionDescriptor")
 }
+
+private fun copyTypesFromExtensionAccessor(
+    accessorFunctionDescriptor: SimpleFunctionDescriptor,
+    extensionAccessorDescriptor: PropertyAccessorDescriptor
+): FunctionDescriptor =
+    SimpleFunctionDescriptorImpl.create(
+        accessorFunctionDescriptor.containingDeclaration,
+        accessorFunctionDescriptor.annotations,
+        accessorFunctionDescriptor.name,
+        accessorFunctionDescriptor.kind,
+        accessorFunctionDescriptor.source
+    ).apply {
+        initialize(
+            null,
+            extensionAccessorDescriptor.extensionReceiverParameter?.copy(this),
+            emptyList(),
+            extensionAccessorDescriptor.valueParameters.map { it.copy(this, it.name, it.index) },
+            extensionAccessorDescriptor.returnType,
+            accessorFunctionDescriptor.modality,
+            accessorFunctionDescriptor.visibility
+        )
+    }
