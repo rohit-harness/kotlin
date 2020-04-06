@@ -75,5 +75,7 @@ class KtClassOrObjectTreeNode(project: Project?, ktClassOrObject: KtClassOrObjec
         return false
     }
 
+    override fun expandOnDoubleClick(): Boolean = false
+
     override fun getWeight() = 20
 }
