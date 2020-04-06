@@ -26,6 +26,7 @@ import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.cli.common.arguments.K2JSDceArguments
 import org.jetbrains.kotlin.cli.js.dce.K2JSDce
 import org.jetbrains.kotlin.compilerRunner.runToolInSeparateProcess
+import org.jetbrains.kotlin.compilerRunner.writeArgumentsToFile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDce
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDceOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDceOptionsImpl
@@ -87,9 +88,10 @@ open class KotlinJsDce : AbstractKotlinCompileTool<K2JSDceArguments>(), KotlinJs
 
         if (isGradleVersionAtLeast(6,0)) {
             val gradleExecutionOperation = project.objects.newInstance(GradleExecOperationsHolder::class.java)
+            val compilationArguments = writeArgumentsToFile(project.buildDir, allArgs)
             gradleExecutionOperation.execOperation.javaexec {
                 it.classpath = project.files(computedCompilerClasspath)
-                it.args = allArgs.toList()
+                it.args = listOf("@${compilationArguments.absolutePath}")
                 it.main = K2JSDce::class.java.name
             }.rethrowFailure()
         } else {

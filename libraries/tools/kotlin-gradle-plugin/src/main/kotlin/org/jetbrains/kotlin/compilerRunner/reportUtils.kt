@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.config.KotlinCompilerVersion
 import org.jetbrains.kotlin.daemon.client.DaemonReportingTargets
 import org.jetbrains.kotlin.daemon.client.launchProcessWithFallback
 import org.jetbrains.kotlin.gradle.logging.GradleKotlinLogger
+import org.jetbrains.kotlin.gradle.tasks.internal.GradleExecOperationsHolder
 import org.jetbrains.org.objectweb.asm.ClassReader
 import org.jetbrains.org.objectweb.asm.ClassVisitor
 import org.jetbrains.org.objectweb.asm.FieldVisitor
@@ -88,8 +89,7 @@ internal fun runToolInSeparateProcess(
     val javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"
     val classpathString = classpath.map { it.absolutePath }.joinToString(separator = File.pathSeparator)
 
-    val compilerOptions = dir.resolve("compiler.options")
-    compilerOptions.writeText(argsArray.joinToString(" "))
+    val compilerOptions = writeArgumentsToFile(dir, argsArray)
 
     val builder = ProcessBuilder(javaBin, "-cp", classpathString, compilerClassName, "@${compilerOptions.absolutePath}")
     val messageCollector = createLoggingMessageCollector(logger)
@@ -117,6 +117,12 @@ internal fun runToolInSeparateProcess(
     val exitCode = process.waitFor()
     logger.logFinish(OUT_OF_PROCESS_EXECUTION_STRATEGY)
     return exitCodeFromProcessExitCode(logger, exitCode)
+}
+
+internal fun writeArgumentsToFile(dir: File, argsArray: Array<String>): File {
+    val compilerOptions = dir.resolve("compiler.options")
+    compilerOptions.writeText(argsArray.joinToString(" "))
+    return compilerOptions
 }
 
 private fun createLoggingMessageCollector(log: KotlinLogger): MessageCollector = object : MessageCollector {
