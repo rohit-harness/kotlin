@@ -1612,7 +1612,7 @@ object Aggregates : TemplateGroupBase() {
                 Performs the given [action] on each ${f.element}, providing sequential index with the ${f.element}, 
                 and returns the ${f.collection} itself afterwards.
                 @param [action] function that takes the index of ${f.element.prefixWithArticle()} and the ${f.element} itself
-                and performs the desired action on the ${f.element}.
+                and performs the action on the ${f.element}.
                 """
         }
 
@@ -1622,10 +1622,9 @@ object Aggregates : TemplateGroupBase() {
             body { "return apply { forEachIndexed(action) }" }
         }
 
-        specialFor(Iterables, Maps, CharSequences) {
-            inlineOnly()
+        specialFor(Iterables, CharSequences) {
+            inline()
             val collectionType = when (f) {
-                Maps -> "M"
                 CharSequences -> "S"
                 else -> "C"
             }
@@ -1641,7 +1640,7 @@ object Aggregates : TemplateGroupBase() {
                 """
                 Returns a sequence which performs the given [action] on each ${f.element} of the original sequence as they pass through it.
                 @param [action] function that takes the index of ${f.element.prefixWithArticle()} and the ${f.element} itself
-                and performs the desired action on the ${f.element}.
+                and performs the action on the ${f.element}.
                 """
             }
             sequenceClassification(intermediate, stateless)
@@ -1684,7 +1683,7 @@ object Aggregates : TemplateGroupBase() {
             """
             Performs the given [action] on each ${f.element}, providing sequential index with the ${f.element}.
             @param [action] function that takes the index of ${f.element.prefixWithArticle()} and the ${f.element} itself
-            and performs the desired action on the ${f.element}.
+            and performs the action on the ${f.element}.
             """ }
         returns("Unit")
         body {

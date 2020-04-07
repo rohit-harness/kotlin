@@ -1653,7 +1653,7 @@ public inline fun <T> Iterable<T>.forEach(action: (T) -> Unit): Unit {
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun <T> Iterable<T>.forEachIndexed(action: (index: Int, T) -> Unit): Unit {
     var index = 0
@@ -1869,10 +1869,9 @@ public inline fun <T, C : Iterable<T>> C.onEach(action: (T) -> Unit): C {
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the collection itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
-@kotlin.internal.InlineOnly
 public inline fun <T, C : Iterable<T>> C.onEachIndexed(action: (index: Int, T) -> Unit): C {
     return apply { forEachIndexed(action) }
 }

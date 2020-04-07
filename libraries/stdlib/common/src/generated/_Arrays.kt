@@ -12119,7 +12119,7 @@ public inline fun CharArray.forEach(action: (Char) -> Unit): Unit {
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun <T> Array<out T>.forEachIndexed(action: (index: Int, T) -> Unit): Unit {
     var index = 0
@@ -12129,7 +12129,7 @@ public inline fun <T> Array<out T>.forEachIndexed(action: (index: Int, T) -> Uni
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun ByteArray.forEachIndexed(action: (index: Int, Byte) -> Unit): Unit {
     var index = 0
@@ -12139,7 +12139,7 @@ public inline fun ByteArray.forEachIndexed(action: (index: Int, Byte) -> Unit): 
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun ShortArray.forEachIndexed(action: (index: Int, Short) -> Unit): Unit {
     var index = 0
@@ -12149,7 +12149,7 @@ public inline fun ShortArray.forEachIndexed(action: (index: Int, Short) -> Unit)
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun IntArray.forEachIndexed(action: (index: Int, Int) -> Unit): Unit {
     var index = 0
@@ -12159,7 +12159,7 @@ public inline fun IntArray.forEachIndexed(action: (index: Int, Int) -> Unit): Un
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun LongArray.forEachIndexed(action: (index: Int, Long) -> Unit): Unit {
     var index = 0
@@ -12169,7 +12169,7 @@ public inline fun LongArray.forEachIndexed(action: (index: Int, Long) -> Unit): 
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun FloatArray.forEachIndexed(action: (index: Int, Float) -> Unit): Unit {
     var index = 0
@@ -12179,7 +12179,7 @@ public inline fun FloatArray.forEachIndexed(action: (index: Int, Float) -> Unit)
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun DoubleArray.forEachIndexed(action: (index: Int, Double) -> Unit): Unit {
     var index = 0
@@ -12189,7 +12189,7 @@ public inline fun DoubleArray.forEachIndexed(action: (index: Int, Double) -> Uni
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun BooleanArray.forEachIndexed(action: (index: Int, Boolean) -> Unit): Unit {
     var index = 0
@@ -12199,7 +12199,7 @@ public inline fun BooleanArray.forEachIndexed(action: (index: Int, Boolean) -> U
 /**
  * Performs the given [action] on each element, providing sequential index with the element.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 public inline fun CharArray.forEachIndexed(action: (index: Int, Char) -> Unit): Unit {
     var index = 0
@@ -13307,7 +13307,7 @@ public inline fun CharArray.none(predicate: (Char) -> Boolean): Boolean {
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the array itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
 @kotlin.internal.InlineOnly
@@ -13319,7 +13319,7 @@ public inline fun <T> Array<out T>.onEachIndexed(action: (index: Int, T) -> Unit
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the array itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
 @kotlin.internal.InlineOnly
@@ -13331,7 +13331,7 @@ public inline fun ByteArray.onEachIndexed(action: (index: Int, Byte) -> Unit): B
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the array itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
 @kotlin.internal.InlineOnly
@@ -13343,7 +13343,7 @@ public inline fun ShortArray.onEachIndexed(action: (index: Int, Short) -> Unit):
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the array itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
 @kotlin.internal.InlineOnly
@@ -13355,7 +13355,7 @@ public inline fun IntArray.onEachIndexed(action: (index: Int, Int) -> Unit): Int
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the array itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
 @kotlin.internal.InlineOnly
@@ -13367,7 +13367,7 @@ public inline fun LongArray.onEachIndexed(action: (index: Int, Long) -> Unit): L
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the array itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
 @kotlin.internal.InlineOnly
@@ -13379,7 +13379,7 @@ public inline fun FloatArray.onEachIndexed(action: (index: Int, Float) -> Unit):
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the array itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
 @kotlin.internal.InlineOnly
@@ -13391,7 +13391,7 @@ public inline fun DoubleArray.onEachIndexed(action: (index: Int, Double) -> Unit
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the array itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
 @kotlin.internal.InlineOnly
@@ -13403,7 +13403,7 @@ public inline fun BooleanArray.onEachIndexed(action: (index: Int, Boolean) -> Un
  * Performs the given [action] on each element, providing sequential index with the element,
  * and returns the array itself afterwards.
  * @param [action] function that takes the index of an element and the element itself
- * and performs the desired action on the element.
+ * and performs the action on the element.
  */
 @SinceKotlin("1.4")
 @kotlin.internal.InlineOnly
