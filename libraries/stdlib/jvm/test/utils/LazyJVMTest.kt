@@ -91,8 +91,9 @@ class LazyJVMTest {
     @Test fun publishOnceLazy() {
         val counter = AtomicInteger(0)
         val initialized = AtomicBoolean(false)
-        val threads = 3
-        val values = Random().let { r -> List(threads) { 50 + r.nextInt(50) } }
+        val coreCount = Runtime.getRuntime().availableProcessors()
+        val threads = (coreCount / 2).coerceIn(2..3)
+        val values = Random().let { r -> List(threads) { 100 + r.nextInt(50) } }
 
         data class Run(val value: Int, val initialized: Boolean)
 
@@ -110,7 +111,7 @@ class LazyJVMTest {
 
         val barrier = CyclicBarrier(threads)
         val accessThreads = List(threads) { thread { barrier.await(); lazy.value } }
-        val result = run { while (!lazy.isInitialized()) /* wait */; lazy.value }
+        val result = run { while (!lazy.isInitialized()) Thread.sleep(1); lazy.value }
         accessThreads.forEach { it.join() }
 
         assertEquals(threads, counter.get())

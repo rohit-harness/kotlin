@@ -29,7 +29,7 @@ class TimerTest {
         if (!latch.await(1500, TimeUnit.MILLISECONDS)) throw TimeoutException()
         val elapsed = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt)
 
-        val expectedRange = 100L..500L
+        val expectedRange = 180L..1000L
         assertTrue(elapsed in expectedRange, "Expected elapsed ($elapsed ms) to fit in range $expectedRange")
         assertSame(task, callbackTask)
     }
