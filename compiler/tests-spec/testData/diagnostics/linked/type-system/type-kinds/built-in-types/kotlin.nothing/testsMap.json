@@ -28,5 +28,18 @@
         }
       ]
     }
+  },
+  "2": {
+    "pos": {
+      "1": [
+        {
+          "specVersion": "0.1-213",
+          "casesNumber": 2,
+          "description": "Check of Nothing type is a subtype of any types",
+          "path": "compiler/tests-spec/testData/diagnostics/linked/type-system/type-kinds/built-in-types/kotlin.nothing/p-1/pos/1.1.kt",
+          "unexpectedBehaviour": false
+        }
+      ]
+    }
   }
 }
