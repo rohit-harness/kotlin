@@ -8,8 +8,7 @@
  *
  * SPEC VERSION: 0.1-213
  * MAIN LINK: type-system, type-kinds, built-in-types, kotlin.nothing -> paragraph 1 -> sentence 1
- * PRIMARY LINKS: overload-resolution, building-the-overload-candidate-set-ocs, call-with-named-parameters -> paragraph 3 -> sentence 1
- * SECONDARY LINKS: overload-resolution, building-the-overload-candidate-set-ocs, call-with-named-parameters -> paragraph 2 -> sentence 1
+ * SECONDARY LINKS: type-system, type-kinds, built-in-types, kotlin.nothing -> paragraph 2 -> sentence 1
  * NUMBER: 1
  * DESCRIPTION: Check of Nothing type is a subtype of any types
  * HELPERS: checkType, functions
