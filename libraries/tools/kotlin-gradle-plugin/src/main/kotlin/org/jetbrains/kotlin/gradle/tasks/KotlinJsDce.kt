@@ -26,15 +26,14 @@ import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.cli.common.arguments.K2JSDceArguments
 import org.jetbrains.kotlin.cli.js.dce.K2JSDce
 import org.jetbrains.kotlin.compilerRunner.runToolInSeparateProcess
-import org.jetbrains.kotlin.compilerRunner.writeArgumentsToFile
+import org.jetbrains.kotlin.compilerRunner.runToolInSeparateProcessForGradle6AndMore
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDce
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDceOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsDceOptionsImpl
 import org.jetbrains.kotlin.gradle.logging.GradleKotlinLogger
-import org.jetbrains.kotlin.gradle.tasks.internal.GradleExecOperationsHolder
 import org.jetbrains.kotlin.gradle.utils.canonicalPathWithoutExtension
-import java.io.File
 import org.jetbrains.kotlin.gradle.utils.isGradleVersionAtLeast
+import java.io.File
 
 @CacheableTask
 open class KotlinJsDce : AbstractKotlinCompileTool<K2JSDceArguments>(), KotlinJsDce {
@@ -87,13 +86,12 @@ open class KotlinJsDce : AbstractKotlinCompileTool<K2JSDceArguments>(), KotlinJs
         val allArgs = argsArray + outputDirArgs + inputFiles
 
         if (isGradleVersionAtLeast(6,0)) {
-            val gradleExecutionOperation = project.objects.newInstance(GradleExecOperationsHolder::class.java)
-            val compilationArguments = writeArgumentsToFile(project.buildDir, allArgs)
-            gradleExecutionOperation.execOperation.javaexec {
-                it.classpath = project.files(computedCompilerClasspath)
-                it.args = listOf("@${compilationArguments.absolutePath}")
-                it.main = K2JSDce::class.java.name
-            }.rethrowFailure()
+            runToolInSeparateProcessForGradle6AndMore(
+                allArgs,
+                K2JSDce::class.java.name,
+                computedCompilerClasspath,
+                project
+            ).rethrowFailure()
         } else {
             val exitCode = runToolInSeparateProcess(
                 allArgs,
