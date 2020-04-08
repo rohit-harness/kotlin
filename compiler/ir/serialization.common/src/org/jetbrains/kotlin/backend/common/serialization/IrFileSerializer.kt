@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.library.impl.IrMemoryArrayWriter
 import org.jetbrains.kotlin.library.impl.IrMemoryDeclarationWriter
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.backend.common.serialization.proto.Actual as ProtoActual
 import org.jetbrains.kotlin.backend.common.serialization.proto.FieldAccessCommon as ProtoFieldAccessCommon
@@ -1051,9 +1050,6 @@ open class IrFileSerializer(
             .build()
 
     private fun serializeIrFunction(declaration: IrSimpleFunction): ProtoFunction {
-        if(declaration.nameForIrSerialization.toString() == "createJsMap") {
-            println("SERIALIZING: ${declaration.render()}")
-        }
         val proto = ProtoFunction.newBuilder()
             .setBase(serializeIrFunctionBase(declaration, FunctionFlags.encode(declaration)))
 
@@ -1125,8 +1121,9 @@ open class IrFileSerializer(
             .setName(serializeName(clazz.name))
 
         clazz.declarations.forEach {
-            if (!(it.isFakeOverride && declarationTable.isExportedDeclaration(it) && !backendSpecificFakeOverrideFilter(clazz) ))
+            if (memberNeedsSerialization(it)) {
                 proto.addDeclaration(serializeDeclaration(it))
+            }
         }
 
         clazz.typeParameters.forEach {
@@ -1216,7 +1213,13 @@ open class IrFileSerializer(
     open fun backendSpecificExplicitRoot(declaration: IrFunction) = false
     open fun backendSpecificExplicitRoot(declaration: IrClass) = false
     open fun keepOrderOfProperties(property: IrProperty): Boolean = !property.isConst
-    open fun backendSpecificFakeOverrideFilter(irClass: IrClass) = false
+    open fun backendSpecificSerializeAllMembers(irClass: IrClass) = false
+
+    fun memberNeedsSerialization(member: IrDeclaration): Boolean {
+        assert(member.parent is IrClass)
+        if (backendSpecificSerializeAllMembers(member.parent as IrClass)) return true
+        return !(member.isFakeOverride && declarationTable.isExportedDeclaration(member))
+    }
 
     fun serializeIrFile(file: IrFile): SerializedIrFile {
         val topLevelDeclarations = mutableListOf<SerializedDeclaration>()

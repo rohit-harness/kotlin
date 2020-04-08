@@ -262,8 +262,6 @@ abstract class DescriptorMangleComputer(protected val builder: StringBuilder, pr
         descriptor.containingDeclaration.accept(this, false)
 
         if (descriptor.isRealStatic) {
-            println("MATCHER: $descriptor")
-            if (descriptor is WrappedPropertyDescriptor) println("MATCHER: ${descriptor.owner.getter?.dispatchReceiverParameter?.descriptor}")
             builder.appendSignature(MangleConstant.STATIC_MEMBER_MARK)
         }
 

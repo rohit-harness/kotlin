@@ -45,7 +45,6 @@ class IrLazyClass(
 
     init {
         symbol.bind(this)
-        if (name.toString() == "NSObject") Throwable().printStackTrace()
     }
 
     override var thisReceiver: IrValueParameter? by lazyVar {

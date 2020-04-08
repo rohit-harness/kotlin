@@ -50,8 +50,7 @@ abstract class KotlinIrLinker(
     val symbolTable: SymbolTable,
     private val exportedDependencies: List<ModuleDescriptor>,
     private val forwardModuleDescriptor: ModuleDescriptor?,
-    private val calculateFakeOverrides: Boolean,
-    signaturer: IdSignatureSerializer
+    private val calculateFakeOverrides: Boolean
 ) : IrDeserializer {
 
     private val expectUniqIdToActualUniqId = mutableMapOf<IdSignature, IdSignature>()
@@ -123,7 +122,6 @@ abstract class KotlinIrLinker(
 
     protected val globalDeserializationState = DeserializationState.SimpleDeserializationState { true }
     private val modulesWithReachableTopLevels = mutableSetOf<IrModuleDeserializer>()
-    //private val fakeOverrideBuilder = FakeOverrideBuilder(symbolTable, signaturer, globalDeserializationState)
     private val haveSeen = mutableSetOf<IrSymbol>()
 
     //TODO: This is Native specific. Eliminate me.
@@ -171,11 +169,7 @@ abstract class KotlinIrLinker(
             }
 
             fun deserializeDeclaration(idSig: IdSignature): IrDeclaration {
-                return deserializeDeclaration(loadTopLevelDeclarationProto(idSig), file).also {
-                    if (it is IrClass) {
-                      //  fakeOverrideBuilder.needsFakeOverride(it, getStateForID(idSig) as DeserializationState<IdSignature>)
-                    }
-                }
+                return deserializeDeclaration(loadTopLevelDeclarationProto(idSig), file)
             }
 
             fun deserializeExpectActualMapping() {
@@ -662,17 +656,6 @@ abstract class KotlinIrLinker(
         }
 
         val topLevelSignature = signature.topLevelSignature()
-/*
-        if (topLevelSignature.isClass) {
-            val classSymbol = symbolTable.referenceClassFromLinker(WrappedClassDescriptor(), topLevelSignature)
-            println("classSymbol: ${classSymbol.descriptor} ${classSymbol}")
-            if (classSymbol.isBound) {
-                // This looks like a fake override.
-                println("classSYmbol is Bound returning null")
-                return null
-            }
-        }
-*/
 
         if (haveSeen.contains(symbol)) {
             // println("Fake override suspect: ${(symbol as? IrSimpleFunctionPublicSymbolImpl)?.signature}")
@@ -686,7 +669,6 @@ abstract class KotlinIrLinker(
 
         deserializeAllReachableTopLevels()
 
-        //fakeOverrideBuilder.buildFakeOverrides()
         return descriptor
     }
 

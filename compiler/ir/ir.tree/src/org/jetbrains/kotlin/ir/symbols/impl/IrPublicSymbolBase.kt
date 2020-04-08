@@ -24,10 +24,6 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
             "Substituted descriptor $descriptor for ${descriptor.original}"
         }
         assert(sig.isPublic)
-        if (sig.toString()  == "kotlinx.cinterop.internal/CCall.<init>|1280618353163213788[0]") {
-            println("NEW SYMBOL for $sig")
-            Throwable().printStackTrace()
-        }
     }
 
     private fun isOriginalDescriptor(descriptor: DeclarationDescriptor): Boolean =
@@ -60,12 +56,6 @@ abstract class IrBindablePublicSymbolBase<out D : DeclarationDescriptor, B : IrS
 class IrClassPublicSymbolImpl(descriptor: ClassDescriptor, sig: IdSignature) :
     IrBindablePublicSymbolBase<ClassDescriptor, IrClass>(descriptor, sig),
     IrClassSymbol {
-    init {
-        if ((descriptor !is WrappedDeclarationDescriptor<*>) && descriptor.name.toString() =="NSObject") {
-            println("NEW")
-            Throwable().printStackTrace()
-        }
-    }
 }
 
 class IrEnumEntryPublicSymbolImpl(descriptor: ClassDescriptor, sig: IdSignature) :

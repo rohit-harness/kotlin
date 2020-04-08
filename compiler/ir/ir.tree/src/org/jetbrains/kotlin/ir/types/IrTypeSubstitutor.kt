@@ -38,11 +38,8 @@ class IrTypeSubstitutor(
     }
 
     private fun getSubstitutionArgument(typeParameter: IrTypeParameterSymbol): IrTypeArgument =
-       // if (allowUnsubstituted)
-       //     substitution[typeParameter] ?: typeParameter.owner
-       // else
-            substitution[typeParameter]
-                ?: throw AssertionError("Unsubstituted type parameter: ${typeParameter.owner.render()}")
+        substitution[typeParameter]
+            ?: throw AssertionError("Unsubstituted type parameter: ${typeParameter.owner.render()}")
 
     fun substitute(type: IrType): IrType {
         if (substitution.isEmpty()) return type

@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
 class JsIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable, deserializeFakeOverrides: Boolean) :
-    KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, deserializeFakeOverrides, IdSignatureSerializer(JsManglerIr)) {
+    KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, deserializeFakeOverrides) {
 
     override fun reader(moduleDescriptor: ModuleDescriptor, fileIndex: Int, idSigIndex: Int) =
         moduleDescriptor.kotlinLibrary.irDeclaration(idSigIndex, fileIndex)

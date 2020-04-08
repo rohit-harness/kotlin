@@ -48,10 +48,8 @@ class FakeOverrideBuilder(val symbolTable: SymbolTable, val signaturer: IdSignat
         val substitutionMap = typeParameters.zip(typeArguments).toMap()
         val copier = DeepCopyIrTreeWithSymbolsForFakeOverrides(substitutionMap, superType, clazz)
 
-        //require(member is IrOverridableDeclaration<*>)
         require(member is IrProperty || member is IrSimpleFunction)
         val deepCopyFakeOverride = copier.copy(member) as IrDeclaration
-        //require(deepCopyFakeOverride is IrOverridableDeclaration<*>)
         require(deepCopyFakeOverride is IrProperty || deepCopyFakeOverride is IrSimpleFunction)
         deepCopyFakeOverride.parent = clazz
         require(deepCopyFakeOverride is IrSymbolOwner)
@@ -85,7 +83,6 @@ class FakeOverrideBuilder(val symbolTable: SymbolTable, val signaturer: IdSignat
         }
 
         debug("\n\nBUILDING fake overrides for ${clazz.render()}:")
-
 
         val existingMembers = clazz.declarations
             .filter{ it is IrProperty || it is IrSimpleFunction }
@@ -157,7 +154,7 @@ class FakeOverrideBuilder(val symbolTable: SymbolTable, val signaturer: IdSignat
             mergedOverrideCandidates.updateMergedCandidatesWith(candidate)
         }
 
-        debug("\nDESERIALIZED:\n\t${existingMembers.map {it.render()}.joinToString("\n\t")}")
+        debug("\nDESERIALIZED members:\n\t${existingMembers.map {it.render()}.joinToString("\n\t")}")
 
         val fakeOverrides = mergedOverrideCandidates
             .map { singleFakeOverride ->
@@ -177,7 +174,7 @@ class FakeOverrideBuilder(val symbolTable: SymbolTable, val signaturer: IdSignat
                 singleFakeOverride
             }
 
-        debug("SYNTHESIZED:\n\t${fakeOverrides.map {it.render()}.joinToString("\n\t")}}")
+        debug("SYNTHESIZED members:\n\t${fakeOverrides.map {it.render()}.joinToString("\n\t")}}")
 
         fun redelegateFunction(fake: IrSimpleFunction) {
             val properSignature = signaturer.composePublicIdSignature(fake)
@@ -188,13 +185,10 @@ class FakeOverrideBuilder(val symbolTable: SymbolTable, val signaturer: IdSignat
             (fake.symbol as? IrDelegatingSimpleFunctionSymbolImpl)?.let {
                 debug("REDELEGATING ${fake.nameForIrSerialization} to $deserializedSymbol")
                 it.delegate = deserializedSymbol
-            } ?: error("Somebody else's fake override: in ${ir2string(clazz)} ${ir2string(fake)} ${fake.symbol}")
+            } ?: error("Expected a delegating symbol in ${clazz.render()} ${fake.render()} ${fake.symbol}")
 
-            if (!deserializedSymbol.isBound) {
-                // debug("binding $deserializedSymbol to $fake ${ir2string(fake)}")
-                deserializedSymbol.bind(fake)
-                symbolTable.rebindSimpleFunction(properSignature, fake)
-            } else println("Something's wrong? Symbol is already bound to ${ir2string(deserializedSymbol.owner)}") // TODO: make me an assert.
+            deserializedSymbol.bind(fake)
+            symbolTable.rebindSimpleFunction(properSignature, fake)
 
             (deserializedSymbol.descriptor as? WrappedSimpleFunctionDescriptor)?.let {
                 if (!it.isBound()) it.bind(fake)
@@ -208,15 +202,12 @@ class FakeOverrideBuilder(val symbolTable: SymbolTable, val signaturer: IdSignat
                 symbolTable.referencePropertyFromLinker(WrappedPropertyDescriptor(), properSignature)
 
             (fake.symbol as? IrDelegatingPropertySymbolImpl)?.let {
-                //println("Redelegating ${fake.nameForIrSerialization} to $deserializedSymbol")
+                debug("REDELEGATING ${fake.nameForIrSerialization} to $deserializedSymbol")
                 it.delegate = deserializedSymbol
-            } ?: error("Somebody else's fake override: in ${ir2string(clazz)} ${ir2string(fake)} ${fake.symbol}")
+            } ?: error("Expected a delegating symbol in ${ir2string(clazz)} ${ir2string(fake)} ${fake.symbol}")
 
-            if (!deserializedSymbol.isBound) {
-                //println("binding $deserializedSymbol to $fake ${ir2string(fake)}")
-                deserializedSymbol.bind(fake)
-                symbolTable.rebindProperty(properSignature, fake)
-            } else println("Something's wrong? Symbol is already bound to ${ir2string(deserializedSymbol.owner)}") // TODO: make me an assert.
+            deserializedSymbol.bind(fake)
+            symbolTable.rebindProperty(properSignature, fake)
 
             (deserializedSymbol.descriptor as? WrappedPropertyDescriptor)?.let {
                 if (!it.isBound()) it.bind(fake)
@@ -247,13 +238,6 @@ class FakeOverrideBuilder(val symbolTable: SymbolTable, val signaturer: IdSignat
     }
 
     fun IrDeclaration.overrides(other: IrDeclaration, considerModality: Boolean = false): Boolean {
-
-        // fun dbg(any: Any?) {
-        //    if (this.nameForIrSerialization.toString() != "interceptContinuation") return
-        //    if (other.nameForIrSerialization.toString() != "interceptContinuation") return
-        //    println(any)
-        //}
-
         when (this) {
             is IrSimpleFunction -> {
                 if (other !is IrSimpleFunction) return false
@@ -308,169 +292,3 @@ class FakeOverrideBuilder(val symbolTable: SymbolTable, val signaturer: IdSignat
 
 private fun IrType.render(): String = RenderIrElementVisitor().renderType(this)
 
-
-// This is basicly modelled after the inliner copier.
-class DeepCopyIrTreeWithSymbolsForFakeOverrides(
-    val typeArguments: Map<IrTypeParameterSymbol, IrType?>?,
-    val superType: IrType,
-    val parent: IrClass
-) {
-
-    fun copy(irElement: IrElement): IrElement {
-        // Create new symbols.
-        irElement.acceptVoid(symbolRemapper)
-
-        // Make symbol remapper aware of the callsite's type arguments.
-        symbolRemapper.typeArguments = typeArguments
-
-        // Copy IR.
-        val result = irElement.transform(copier, data = null)
-
-        // Bind newly created IR with wrapped descriptors.
-        result.acceptVoid(WrappedDescriptorPatcher)
-
-        result.patchDeclarationParents(parent)
-        return result
-    }
-
-    private inner class FakeOverrideTypeRemapper(
-        val symbolRemapper: SymbolRemapper,
-        val typeArguments: Map<IrTypeParameterSymbol, IrType?>?
-    ) : TypeRemapper {
-
-        override fun enterScope(irTypeParametersContainer: IrTypeParametersContainer) {}
-
-        override fun leaveScope() {}
-
-        private fun remapTypeArguments(arguments: List<IrTypeArgument>) =
-            arguments.map { argument ->
-                (argument as? IrTypeProjection)?.let { makeTypeProjection(remapType(it.type), it.variance) }
-                    ?: argument
-            }
-
-        override fun remapType(type: IrType): IrType {
-            if (type !is IrSimpleType) return type
-
-            val substitutedType = typeArguments?.get(type.classifier)
-
-            if (substitutedType is IrDynamicType) return substitutedType
-
-            if (substitutedType is IrSimpleType) {
-                return substitutedType.buildSimpleType {
-                    kotlinType = null
-                    hasQuestionMark = type.hasQuestionMark or substitutedType.isMarkedNullable()
-                }
-            }
-
-            return type.buildSimpleType {
-                kotlinType = null
-                classifier = symbolRemapper.getReferencedClassifier(type.classifier)
-                arguments = remapTypeArguments(type.arguments)
-                annotations = type.annotations.map { it.transform(copier, null) as IrConstructorCall }
-            }
-        }
-    }
-
-    private class FakeOverrideSymbolRemapperImpl(descriptorsRemapper: DescriptorsRemapper) : DeepCopySymbolRemapper(descriptorsRemapper) {
-
-        var typeArguments: Map<IrTypeParameterSymbol, IrType?>? = null
-            set(value) {
-                if (field != null) return
-                field = value?.asSequence()?.associate {
-                    (getReferencedClassifier(it.key) as IrTypeParameterSymbol) to it.value
-                }
-            }
-
-        override fun getReferencedClassifier(symbol: IrClassifierSymbol): IrClassifierSymbol {
-            val result = super.getReferencedClassifier(symbol)
-            if (result !is IrTypeParameterSymbol)
-                return result
-            return typeArguments?.get(result)?.classifierOrNull ?: result
-        }
-    }
-
-    private val symbolRemapper = FakeOverrideSymbolRemapperImpl(DescriptorsToIrRemapper)
-    private val copier =
-        DeepCopyIrTreeForFakeOverrides(symbolRemapper, FakeOverrideTypeRemapper(symbolRemapper, typeArguments), SymbolRenamer.DEFAULT, parent)
-}
-
-class DeepCopyIrTreeForFakeOverrides(
-    val symbolRemapper: SymbolRemapper,
-    val typeRemapper: TypeRemapper,
-    val symbolRenamer: SymbolRenamer,
-    val destinationClass: IrClass
-) : DeepCopyIrTreeWithSymbols(symbolRemapper, typeRemapper, symbolRenamer) {
-
-    private fun <T : IrFunction> T.transformFunctionChildren(declaration: T): T =
-        apply {
-            transformAnnotations(declaration)
-            copyTypeParametersFrom(declaration)
-            typeRemapper.withinScope(this) {
-                // This is more correct way to go, but some lowerings still expect the below behavior.
-                /*
-                val superDispatchReceiver = declaration.dispatchReceiverParameter!!
-                val dispatchReceiverSymbol = IrValueParameterSymbolImpl(WrappedReceiverParameterDescriptor())
-                val dispatchReceiverType = destinationClass.defaultType
-                dispatchReceiverParameter = IrValueParameterImpl(
-                    superDispatchReceiver.startOffset,
-                    superDispatchReceiver.endOffset,
-                    superDispatchReceiver.origin,
-                    dispatchReceiverSymbol,
-                    superDispatchReceiver.name,
-                    superDispatchReceiver.index,
-                    dispatchReceiverType,
-                    null,
-                    superDispatchReceiver.isCrossinline,
-                    superDispatchReceiver.isNoinline
-                )
-                */
-                // Should fake override's receiver be the current class is an open question.
-                dispatchReceiverParameter = declaration.dispatchReceiverParameter?.transform()
-                extensionReceiverParameter = declaration.extensionReceiverParameter?.transform()
-                returnType = typeRemapper.remapType(declaration.returnType)
-                this.valueParameters = declaration.valueParameters.transform()
-            }
-        }
-
-    override fun visitSimpleFunction(declaration: IrSimpleFunction): IrSimpleFunction =
-        IrFunctionImpl(
-            declaration.startOffset, declaration.endOffset,
-            IrDeclarationOrigin.FAKE_OVERRIDE,
-            (wrapInDelegatedSymbol(symbolRemapper.getDeclaredFunction(declaration.symbol)) as IrSimpleFunctionSymbol),
-            symbolRenamer.getFunctionName(declaration.symbol),
-            //INHERITED,
-            declaration.visibility,
-            declaration.modality,
-            declaration.returnType,
-            isInline = declaration.isInline,
-            isExternal = declaration.isExternal,
-            isTailrec = declaration.isTailrec,
-            isSuspend = declaration.isSuspend,
-            isExpect = declaration.isExpect,
-            isFakeOverride = true,
-            isOperator = declaration.isOperator
-        ).apply {
-            transformFunctionChildren(declaration)
-        }
-
-    override fun visitProperty(declaration: IrProperty): IrProperty =
-        IrPropertyImpl(
-            declaration.startOffset, declaration.endOffset,
-            IrDeclarationOrigin.FAKE_OVERRIDE,
-            (wrapInDelegatedSymbol(symbolRemapper.getDeclaredProperty(declaration.symbol)) as IrPropertySymbol),
-            declaration.name,
-            //INHERITED,
-            declaration.visibility,
-            declaration.modality,
-            isVar = declaration.isVar,
-            isConst = declaration.isConst,
-            isLateinit = declaration.isLateinit,
-            isDelegated = declaration.isDelegated,
-            isExpect = declaration.isExpect,
-            isExternal = declaration.isExternal
-        ).apply {
-            transformAnnotations(declaration)
-            this.getter = declaration.getter?.transform()
-            this.setter = declaration.setter?.transform()
-        }
-}

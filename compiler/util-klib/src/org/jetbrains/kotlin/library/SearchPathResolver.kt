@@ -194,8 +194,6 @@ abstract class KotlinLibraryProperResolverWithAttributes<L : KotlinLibrary>(
     override fun libraryMatch(candidate: L, unresolved: UnresolvedLibrary): Boolean {
         val candidatePath = candidate.libraryFile.absolutePath
 
-
-
         val candidateCompilerVersion = candidate.versions.compilerVersion
         val candidateAbiVersion = candidate.versions.abiVersion
         val candidateLibraryVersion = candidate.versions.libraryVersion

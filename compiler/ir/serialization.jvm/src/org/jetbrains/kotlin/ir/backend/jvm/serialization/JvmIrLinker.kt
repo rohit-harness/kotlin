@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.ir.util.IdSignature
 import org.jetbrains.kotlin.ir.util.SymbolTable
 
 class JvmIrLinker(logger: LoggingContext, builtIns: IrBuiltIns, symbolTable: SymbolTable, calculateFakeOverrides: Boolean) :
-    KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, calculateFakeOverrides, IdSignatureSerializer(JvmManglerIr)) {
+    KotlinIrLinker(logger, builtIns, symbolTable, emptyList(), null, calculateFakeOverrides) {
 
     override fun handleNoModuleDeserializerFound(idSignature: IdSignature): DeserializationState<*> {
         // TODO: Implement special java-module deserializer instead of this hack

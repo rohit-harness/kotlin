@@ -15,7 +15,7 @@ open class IrTypeCheckerContextWithAdditionalAxioms(
 ) : IrTypeCheckerContext(irBuiltIns) {
     init {
         assert(firstParameters.size == secondParameters.size) {
-            "Should be the same number of type parameters: $firstParameters vs $secondParameters"
+            "defferent length of type parameter lists: $firstParameters vs $secondParameters"
         }
     }
 
