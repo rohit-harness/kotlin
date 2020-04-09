@@ -90,21 +90,19 @@ class LazyJVMTest {
 
     @Test fun publishOnceLazy() {
         val counter = AtomicInteger(0)
-        val initialized = AtomicBoolean(false)
         val coreCount = Runtime.getRuntime().availableProcessors()
         val threads = (coreCount / 2).coerceIn(2..3)
         val values = Random().let { r -> List(threads) { 100 + r.nextInt(50) } }
 
-        data class Run(val value: Int, val initialized: Boolean)
+        data class Run(val id: Int, val value: Int)
 
         val runs = ConcurrentLinkedQueue<Run>()
 
         val initializer = {
             val id = counter.getAndIncrement()
             val value = values[id]
-            runs += Run(value, initialized.get())
+            runs += Run(id, value)
             Thread.sleep(value.toLong())
-            initialized.set(true)
             value
         }
         val lazy = lazy(LazyThreadSafetyMode.PUBLICATION, initializer)
@@ -116,10 +114,7 @@ class LazyJVMTest {
 
         assertEquals(threads, counter.get())
         assertEquals(result, lazy.value, "Value must not change after isInitialized is set: $lazy, runs: $runs")
-
-        runs.forEach {
-            assertFalse(it.initialized, "Expected uninitialized on all initializer executions, runs: $runs")
-        }
+        assertTrue(runs.any { it.value == result }, "Unexpected lazy result value: $result, runs: $runs")
     }
 
     @Test fun publishOnceLazyRace() {
