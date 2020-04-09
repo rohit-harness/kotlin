@@ -126,3 +126,6 @@ task testNoJdk7(type: Test, dependsOn: noJdk7TestClasses) {
 
 check.dependsOn testJdk6Tests, testNoJdk7
 
+tasks.withType(Test) {
+    usesService(multithreadedTestService)
+}

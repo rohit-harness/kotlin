@@ -119,3 +119,7 @@ task testJdk6Tests(type: Test) { thisTask ->
             enabled(file(executable).parentFile.isDirectory())
     }
 }
+
+tasks.withType(Test) {
+    usesService(multithreadedTestService)
+}

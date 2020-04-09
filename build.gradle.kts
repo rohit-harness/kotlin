@@ -329,6 +329,11 @@ val defaultJvmTarget = "1.8"
 val defaultJavaHome = jdkPath(defaultJvmTarget)
 val ignoreTestFailures by extra(project.kotlinBuildProperties.ignoreTestFailures)
 
+interface MTTestBuildService : BuildService<BuildServiceParameters.None>
+val multithreadedTestService by extra(gradle.sharedServices.registerIfAbsent("multithreadedTestService", MTTestBuildService::class.java) {
+    maxParallelUsages.set(1)
+})
+
 allprojects {
 
     configurations.maybeCreate("embedded")

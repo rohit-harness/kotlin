@@ -141,6 +141,10 @@ compileTestKotlin {
     }
 }
 
+test {
+    usesService(multithreadedTestService)
+}
+
 compileLongRunningTestKotlin {
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalStdlibApi"
 }
